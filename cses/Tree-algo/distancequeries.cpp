@@ -1,0 +1,66 @@
+#include<iostream>
+#include<bits/stdc++.h>
+using namespace std;
+vector<int>ar[200001];
+int depth[200001];
+int n,q,m=20,a,b;
+int dp[200001][20];
+
+
+void dfs(int node,int par){
+    depth[node]=1+depth[par];
+    
+    for(int child:ar[node]){
+        if(child!=par){
+            dp[child][0]=node;
+            for(int i=1;i<m;i++){
+                dp[child][i]=dp[dp[child][i-1]][i-1];
+            }
+             dfs(child,node);
+        }
+    }
+}
+int main()
+{
+    cin>>n>>q;
+    for(int i=1;i<n;i++)
+    {
+        cin>>a>>b;
+        ar[a].push_back(b);
+        ar[b].push_back(a);
+    }
+    
+    dfs(1,0);
+    
+    while(q--){
+        int node1 , node2 , ans=0;
+        cin>>node1>>node2;
+        
+        if(depth[node1] < depth[node2])
+            swap(node1,node2);
+        
+       int k=depth[node1]-depth[node2];
+       
+       ans=k;
+       
+       for(int i=m-1;i>=0;i--){
+            if(k&(1<<i)){
+                node1=dp[node1][i];
+            }
+        }
+        
+        
+        if(node1==node2){
+            cout<<ans<<endl;
+            continue;
+        }
+        for(int i=m-1;i>=0;i--){
+            if(dp[node1][i]!=dp[node2][i]){
+                 node1=dp[node1][i];
+                 node2=dp[node2][i];
+                 ans+=(1<<(i+1));
+            }
+        }
+       cout<<ans+2<<endl;
+    }
+}
